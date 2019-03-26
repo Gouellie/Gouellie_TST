@@ -1,3 +1,6 @@
+#include <iostream>
+#include <memory>
+
 #include "FileManager.h"
 #include "InputManager.h"
 
@@ -15,7 +18,7 @@ std::ostream& operator<<(std::ostream& stream, const FileManager::record& other)
 
 void FileManager::Debug()
 {
-    AddRecord( 128,  541.00f, "Guillaume", "Ouellet");
+    AddRecord( 128,  541.00f, "Gabo",      "Linso");
     AddRecord(  32,   12.73f, "Joe",       "Blow");
     AddRecord(  54, 1056.98f, "Jack",      "Black");
     AddRecord( 324,  354.29f, "Akwa",      "Fina");
@@ -23,17 +26,17 @@ void FileManager::Debug()
 
 void FileManager::ShowMainMenu()
 {
-    std::wstring text;
-    text += L"***Acount Information System***\n";
-    text += L"Records found: " + std::to_wstring(FileManager::GetRecordsCount()) + L"\n";
-    text += L"Select one option below\n";
-    text += L"    1-->Add Record to file\n";
-    text += L"    2-->Show Record from file\n";
-    text += L"    3-->Search Record from file\n";
-    text += L"    4-->Update Record\n";
-    text += L"    5-->Delete Record\n";
-    text += L"    6-->Quit\n\n";
-    text += L"Enter your choice: ";
+    std::string text;
+    text += "***Acount Information System***\n";
+    text += "Records found: " + std::to_string(FileManager::GetRecordsCount()) + "\n";
+    text += "Select one option below\n";
+    text += "    1-->Add Record to file\n";
+    text += "    2-->Show Record from file\n";
+    text += "    3-->Search Record from file\n";
+    text += "    4-->Update Record\n";
+    text += "    5-->Delete Record\n";
+    text += "    6-->Quit\n\n";
+    text += "Enter your choice: ";
     FileManager::MainSelection(GetSelectionNumb(1, 6, text));
 }
 
@@ -61,15 +64,15 @@ void FileManager::ShowRecord()
 
 void FileManager::SearchRecord()
 {
-    std::wstring text;
-    text += L"***Acount Information System***\n";
-    text += L"Records found: " + std::to_wstring(FileManager::GetRecordsCount()) + L"\n";
-    text += L"Select one option below\n";
-    text += L"    1-->Search by Account Number\n";
-    text += L"    2-->Search by Name\n";
-    text += L"    3-->Return to main menu\n\n";
-    text += L"Enter your choice: ";
-    FileManager::SearchSelection(GetSelectionNumb(1, 3, text));
+    std::string text;
+    text += "***Acount Information System***\n";
+    text += "Records found: " + std::to_string(FileManager::GetRecordsCount()) + "\n";
+    text += "Select one option below\n";
+    text += "    1-->Search by Account Number\n";
+    text += "    2-->Search by Name\n";
+    text += "    3-->Return to main menu\n\n";
+    text += "Enter your choice: ";
+    FileManager::searchSelection(GetSelectionNumb(1, 3, text));
 }
 
 void FileManager::UpdateRecord()
@@ -85,7 +88,7 @@ void FileManager::DeleteRecord()
 FileManager::record FileManager::createNewRecord()
 {
     record newRecord;
-    newRecord.m_accountNumb = setAccountNumb();
+    newRecord.m_accountNumb = enterAccountNumb();
     newRecord.m_firstName   = setName("Enter First Name: ");
     newRecord.m_lastName    = setName("Enter Last Name: ");
     newRecord.m_balance     = setAccountBalance();
@@ -102,7 +105,7 @@ std::string FileManager::setName(const char* message)
 }
 
 
-int FileManager::setAccountNumb()
+int FileManager::enterAccountNumb()
 {
     int accountNumb;
     std::cout << "Enter Account Number: ";
@@ -116,6 +119,30 @@ float FileManager::setAccountBalance()
     std::cout << "Enter Account Balance: ";
     std::cin >> accountBalance;
     return accountBalance;
+}
+
+void FileManager::searchByAccountNumb()
+{
+    int accountNumb = enterAccountNumb();
+    std::cout << std::endl;
+    for each (auto rec in files)
+        if (rec.m_accountNumb == accountNumb)
+        {
+            std::cout << rec << std::endl;
+            return;
+        }
+    std::cout << "No Record Found with Account Number " << accountNumb << std::endl;
+}
+
+FileManager::record* FileManager::getRecord(int accountNumb)
+{
+    return nullptr;
+}
+
+
+void FileManager::searchByName()
+{
+
 }
 
 void FileManager::MainSelection(int selection)
@@ -140,20 +167,25 @@ void FileManager::MainSelection(int selection)
         FileManager::DeleteRecord();
         break;
     case 6:
+        std::cout << "Goodbye." << std::endl;
+        system("pause");
         FileManager::Quit = true;
     default:
         break;
     }
 }
 
-void FileManager::SearchSelection(int selection)
+void FileManager::searchSelection(int selection)
 {
     std::cout << std::endl;
     switch (selection)
     {
     case 1:
+        FileManager::searchByAccountNumb();
+        system("pause");
         break;
     case 2:
+        FileManager::searchByName();
         break;
     case 3:
         FileManager::ShowMainMenu();
@@ -161,4 +193,5 @@ void FileManager::SearchSelection(int selection)
     default:
         break;
     }
+    FileManager::SearchRecord();
 }

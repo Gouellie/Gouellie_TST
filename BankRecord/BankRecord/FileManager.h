@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 
 class FileManager
 {
@@ -29,13 +30,16 @@ public:
     static void SearchRecord();
     static void UpdateRecord();
     static void DeleteRecord();
-    static int GetRecordsCount() {return files.size();}
+    static int  GetRecordsCount() {return files.size();}
     static void MainSelection(int);
-    static void SearchSelection(int);
+    static void searchSelection(int);
 private:
     static void AddRecord(int accountNumb, float accountBalance, const char* firstName, const char* lastName);
     static record createNewRecord();
     static std::string setName(const char* message);
-    static int setAccountNumb();
+    static int enterAccountNumb();
     static float setAccountBalance();
+    static void searchByAccountNumb();
+    static void searchByName();
+    static FileManager::record* getRecord(int);
 };
