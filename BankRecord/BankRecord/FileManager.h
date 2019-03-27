@@ -21,7 +21,7 @@ public:
     static bool Quit;
 private:
     FileManager();
-    static std::vector<record> files;
+    static std::vector<std::shared_ptr<FileManager::record>> files;
 public:
     static void Debug();
     static void ShowMainMenu();
@@ -35,11 +35,11 @@ public:
     static void searchSelection(int);
 private:
     static void AddRecord(int accountNumb, float accountBalance, const char* firstName, const char* lastName);
-    static record createNewRecord();
+    static std::shared_ptr<FileManager::record> createNewRecord();
     static std::string setName(const char* message);
     static int enterAccountNumb();
     static float setAccountBalance();
     static void searchByAccountNumb();
     static void searchByName();
-    static FileManager::record* getRecord(int);
+    static std::shared_ptr<FileManager::record> getRecord(int);
 };

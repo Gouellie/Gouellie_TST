@@ -5,7 +5,7 @@
 #include "InputManager.h"
 
 struct FileManager::record;
-std::vector<FileManager::record> FileManager::files;
+std::vector<std::shared_ptr<FileManager::record>> FileManager::files;
 
 std::ostream& operator<<(std::ostream& stream, const FileManager::record& other)
 {
@@ -47,17 +47,17 @@ void FileManager::AddRecord()
 
 void FileManager::AddRecord(int accountNumb, float accountBalance, const char* firstName, const char* lastName)
 {
-    record newRecord(accountNumb, accountBalance, firstName, lastName);
-    files.push_back(newRecord);
+    std::shared_ptr<FileManager::record> record = std::make_shared<FileManager::record>(accountNumb, accountBalance, firstName, lastName);
+    files.push_back(record);
 }
 
 void FileManager::ShowRecord()
 {
     std::cout << "Showing " << GetRecordsCount() << " Record(s)" << std::endl;
-    for each (record rec in files)
+    for each (auto rec in files)
     {
         std::cout << "===============================" << std::endl;
-        std::cout << rec << std::endl;
+        std::cout << *rec << std::endl;
     }
     std::cout << "===============================" << std::endl;
 }
@@ -85,22 +85,23 @@ void FileManager::DeleteRecord()
 
 }
 
-FileManager::record FileManager::createNewRecord()
+std::shared_ptr<FileManager::record> FileManager::createNewRecord()
 {
-    record newRecord;
-    newRecord.m_accountNumb = enterAccountNumb();
-    newRecord.m_firstName   = setName("Enter First Name: ");
-    newRecord.m_lastName    = setName("Enter Last Name: ");
-    newRecord.m_balance     = setAccountBalance();
-    return newRecord;
+    std::shared_ptr<FileManager::record> record = std::make_shared<FileManager::record>();
+    record->m_accountNumb = enterAccountNumb();
+    record->m_firstName   = setName("Enter First Name: ");
+    record->m_lastName    = setName("Enter Last Name: ");
+    record->m_balance     = setAccountBalance();
+    return record;
 }
 
 std::string FileManager::setName(const char* message)
 {
-    char nameBuffer[12];
     std::cout << message;
-    std::cin >> nameBuffer;
-    std::string name(nameBuffer);
+    std::string name;
+    std::cin.ignore(); // to ignore the newline that is still on the input buffer and avoid skipping getline.
+    std::getline(std::cin, name);
+    std::cout << "Good";
     return name;
 }
 
@@ -109,7 +110,7 @@ int FileManager::enterAccountNumb()
 {
     int accountNumb;
     std::cout << "Enter Account Number: ";
-    std::cin >> accountNumb;
+    std::cin >> accountNumb; // TODO Add numb check and limit
     return accountNumb;
 }
 
@@ -117,7 +118,7 @@ float FileManager::setAccountBalance()
 {
     float accountBalance;
     std::cout << "Enter Account Balance: ";
-    std::cin >> accountBalance;
+    std::cin >> accountBalance; // TODO Add numb check and limit
     return accountBalance;
 }
 
@@ -125,17 +126,22 @@ void FileManager::searchByAccountNumb()
 {
     int accountNumb = enterAccountNumb();
     std::cout << std::endl;
-    for each (auto rec in files)
-        if (rec.m_accountNumb == accountNumb)
-        {
-            std::cout << rec << std::endl;
-            return;
-        }
-    std::cout << "No Record Found with Account Number " << accountNumb << std::endl;
+    auto rec = getRecord(accountNumb);
+    if (rec == nullptr)
+    {
+        std::cout << "No Record Found with Account Number " << accountNumb << std::endl;
+        system("pause");
+        FileManager::SearchRecord();
+    }
+    else
+        std::cout << *rec << std::endl;
 }
 
-FileManager::record* FileManager::getRecord(int accountNumb)
+std::shared_ptr<FileManager::record> FileManager::getRecord(int accountNumb)
 {
+    for each (auto rec in files)
+        if (rec->m_accountNumb == accountNumb)
+            return rec;
     return nullptr;
 }
 
@@ -193,5 +199,4 @@ void FileManager::searchSelection(int selection)
     default:
         break;
     }
-    FileManager::SearchRecord();
 }
